@@ -66,6 +66,7 @@ module PDK
           end
         else
           report = PDK::Report.new
+          opts[:format] = {}
           report_formats = if opts[:format]
                              opts[:interactive] = false
                              PDK::CLI::Util::OptionNormalizer.report_formats(opts[:format])

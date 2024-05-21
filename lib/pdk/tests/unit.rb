@@ -99,6 +99,9 @@ module PDK
         environment['PUPPET_GEM_VERSION'] = options[:puppet] if options[:puppet]
         spinner_msg = options[:parallel] ? 'Running unit tests in parallel.' : 'Running unit tests.'
 
+        require 'pry-byebug'; binding.pry
+        # options[:interactive] = nil
+        # options[:format] = nil
         if options[:interactive]
           environment['CI_SPEC_OPTIONS'] = if options[:verbose]
                                              '--format documentation'
