@@ -16,6 +16,7 @@ module PDK
       flag nil, :list, 'List all available validators.'
       flag :a, 'auto-correct', 'Automatically correct problems where possible.'
       flag nil, :parallel, 'Run validations in parallel.'
+      flag nil, :'ai-debug', 'Enable AI code assistant.'
 
       run do |opts, args, _cmd|
         # Write the context information to the debug log
