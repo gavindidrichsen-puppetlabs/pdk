@@ -11,6 +11,7 @@ module PDK
       flag nil, :parallel, 'Run unit tests in parallel.'
       flag :v, :verbose, 'More verbose --list output. Displays a list of examples in each unit test file.'
       flag :c, 'clean-fixtures', 'Clean up downloaded fixtures after the test run.'
+      flag nil, :'ai-debug', 'Enable AI code assistant.'
 
       option nil, :tests, 'Specify a comma-separated list of unit test files to run.', argument: :required, default: '' do |values|
         require 'pdk/cli/util/option_validator'

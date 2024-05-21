@@ -8,7 +8,7 @@ module PDK
         For advanced users, pdk bundle runs arbitrary commands in the bundler environment that pdk manages.
         Careless use of this command can lead to errors that pdk can't help recover from.
       EOF
-      skip_option_parsing
+      flag nil, :'ai-debug', 'Enable AI code assistant.'
 
       run do |_opts, args, _cmd|
         require 'pdk/util/bundler'
