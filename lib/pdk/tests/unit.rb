@@ -106,7 +106,7 @@ module PDK
                                              '--format progress'
                                            end
           result = interactive_rake(cmd(tests, options), environment)
-          return result[:exit_code]
+          return result
         end
 
         # Run interactive_rake for documentation output when utilising verbose option.
@@ -114,7 +114,7 @@ module PDK
           environment['CI_SPEC_OPTIONS'] = '--format documentation'
           result = interactive_rake(cmd(tests, options), environment)
           # Caveat: Report will not be written to format option(s) file(s) when there are event failures.
-          return result[:exit_code] unless (result[:exit_code]).zero?
+          return result unless (result[:exit_code]).zero?
 
           spinner_msg = "Exporting unit tests -> #{options[:format]}"
         end
@@ -139,7 +139,7 @@ module PDK
 
         parse_output(report, json_result, result[:duration])
 
-        result[:exit_code]
+        result
       ensure
         tear_down if options[:'clean-fixtures']
       end
