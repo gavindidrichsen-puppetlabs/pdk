@@ -77,8 +77,6 @@ module PDK
                              }]
                            end
 
-          result = PDK::Test::Unit.invoke(report, opts)
-
           # HACK: if ai-debug, then amend the opts to ensure invoke() use rake and not interactive_rake
           if opts[:'ai-debug']
             require 'pdk/cli/util/code_assistant'
@@ -92,14 +90,18 @@ module PDK
             exception_messages = failed_results.map { |result| result["exception"]["message"] }
             exception_messages = exception_messages.map { |message| context + message }
             exception_messages = exception_messages.join("\n")
+            report_formats.each do |format|
+              report.send(format[:method], format[:target])
+            end
             PDK::CLI::Util::CodeAssistant.new(exception_messages)
           else
             result = PDK::Test::Unit.invoke(report, opts)
+            report_formats.each do |format|
+              report.send(format[:method], format[:target])
+            end
           end
 
-          report_formats.each do |format|
-            report.send(format[:method], format[:target])
-          end
+
 
           exit result[:exit_code]
         end
