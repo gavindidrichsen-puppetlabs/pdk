@@ -77,30 +77,31 @@ module PDK
                              }]
                            end
 
-          result = PDK::Test::Unit.invoke(report, opts)
-
           # HACK: if ai-debug, then amend the opts to ensure invoke() use rake and not interactive_rake
           if opts[:'ai-debug']
             require 'pdk/cli/util/code_assistant'
             opts[:format] = {}
             opts[:interactive] = false
             result = PDK::Test::Unit.invoke(report, opts)
-            require 'pry-byebug'
-            # binding.pry
+
             json_results = PDK::Util.find_all_json_in(result[:stdout])
-            failures = json_results.select { |example| example["status"] == "failed" }
-            context = '### THIS IS AN RSPEC-PUPPET + PUPPET FAILURE, SUGGEST FIXES, DONT RETURN THE PROMPT ###'
-            failed_messages = failures.map do |failure|
-              context + failure.dig("exception", "message")
+            context = '### THIS IS AN RSPEC-PUPPET FAILURE, SUGGEST FIXES TO PUPPET MODULE CODE, DONT RETURN THE PROMPT ###'
+            failed_results = json_results[0]["examples"].select { |example| example["status"] == "failed" }
+            exception_messages = failed_results.map { |result| result["exception"]["message"] }
+            exception_messages = exception_messages.map { |message| context + message }
+            exception_messages = exception_messages.join("\n")
+            report_formats.each do |format|
+              report.send(format[:method], format[:target])
             end
-            PDK::CLI::Util::CodeAssistant.new(failed_messages)
+            PDK::CLI::Util::CodeAssistant.new(exception_messages)
           else
             result = PDK::Test::Unit.invoke(report, opts)
+            report_formats.each do |format|
+              report.send(format[:method], format[:target])
+            end
           end
 
-          report_formats.each do |format|
-            report.send(format[:method], format[:target])
-          end
+
 
           exit result[:exit_code]
         end

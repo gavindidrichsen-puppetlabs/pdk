@@ -14,7 +14,6 @@ module PDK
 
         def client
           api_key = ENV.fetch('OPENAI_API_KEY', nil)
-          PDK.logger.info format("Inside the client method #{api_key}")
           begin
             @client = OpenAI::Client.new(
               access_token: api_key,
@@ -32,8 +31,7 @@ module PDK
                 messages: [{ role: "user", content: prompt}],
                 temperature: 0.7,
             })
-          PDK.logger.info format("Code Assistant hint: #{response.dig('choices', 0, 'message', 'content')}")
-          
+          PDK.logger.info("Code Assistant Hint: #{response.dig('choices', 0, 'message', 'content')}")
         end
       end
     end
