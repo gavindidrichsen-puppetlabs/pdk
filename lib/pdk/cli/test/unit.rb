@@ -85,15 +85,14 @@ module PDK
             opts[:format] = {}
             opts[:interactive] = false
             result = PDK::Test::Unit.invoke(report, opts)
-            require 'pry-byebug'
-            # binding.pry
+
             json_results = PDK::Util.find_all_json_in(result[:stdout])
-            failures = json_results.select { |example| example["status"] == "failed" }
-            context = '### THIS IS AN RSPEC-PUPPET + PUPPET FAILURE, SUGGEST FIXES, DONT RETURN THE PROMPT ###'
-            failed_messages = failures.map do |failure|
-              context + failure.dig("exception", "message")
-            end
-            PDK::CLI::Util::CodeAssistant.new(failed_messages)
+            context = '### THIS IS AN RSPEC-PUPPET FAILURE, SUGGEST FIXES TO PUPPET MODULE CODE, DONT RETURN THE PROMPT ###'
+            failed_results = json_results[0]["examples"].select { |example| example["status"] == "failed" }
+            exception_messages = failed_results.map { |result| result["exception"]["message"] }
+            exception_messages = exception_messages.map { |message| context + message }
+            exception_messages = exception_messages.join("\n")
+            PDK::CLI::Util::CodeAssistant.new(exception_messages)
           else
             result = PDK::Test::Unit.invoke(report, opts)
           end
