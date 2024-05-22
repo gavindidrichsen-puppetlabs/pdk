@@ -141,6 +141,7 @@ module PDK
       end
     end
 
+    require 'pdk/cli/ai'
     require 'pdk/cli/bundle'
     require 'pdk/cli/build'
     require 'pdk/cli/convert'
