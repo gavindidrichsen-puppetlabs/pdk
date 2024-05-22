@@ -77,13 +77,32 @@ module PDK
                              }]
                            end
 
-          exit_code = PDK::Test::Unit.invoke(report, opts)
+          result = PDK::Test::Unit.invoke(report, opts)
+
+          # HACK: if ai-debug, then amend the opts to ensure invoke() use rake and not interactive_rake
+          if opts[:'ai-debug']
+            require 'pdk/cli/util/code_assistant'
+            opts[:format] = {}
+            opts[:interactive] = false
+            result = PDK::Test::Unit.invoke(report, opts)
+            require 'pry-byebug'
+            # binding.pry
+            json_results = PDK::Util.find_all_json_in(result[:stdout])
+            failures = json_results.select { |example| example["status"] == "failed" }
+            context = '### THIS IS AN RSPEC-PUPPET + PUPPET FAILURE, SUGGEST FIXES, DONT RETURN THE PROMPT ###'
+            failed_messages = failures.map do |failure|
+              context + failure.dig("exception", "message")
+            end
+            PDK::CLI::Util::CodeAssistant.new(failed_messages)
+          else
+            result = PDK::Test::Unit.invoke(report, opts)
+          end
 
           report_formats.each do |format|
             report.send(format[:method], format[:target])
           end
 
-          exit exit_code
+          exit result[:exit_code]
         end
       end
     end
